@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arusian Language Checker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #334155;
+        }
+        .container {
+            max-width: 900px;
+        }
+        textarea {
+            resize: vertical;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 flex items-center justify-center min-h-screen">
+    <div class="container bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full">
+        <h1 class="text-3xl sm:text-4xl font-bold text-center text-indigo-700 mb-6">
+            Arusian Language Checker
+        </h1>
+        <p class="text-center text-gray-600 mb-8">
+            Enter your Arusian text below to check for potential spelling and grammar issues.
+        </p>
+
+        <div class="mb-6">
+            <label for="inputText" class="block text-gray-700 text-sm font-medium mb-2">Your Ieperisch Text:</label>
+            <textarea id="inputText"
+                      class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-800"
+                      rows="8"
+                      placeholder="Type your Ieperisch text here..."></textarea>
+        </div>
+
+        <button id="checkButton"
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+            Check Text
+        </button>
+
+        <div id="loadingIndicator" class="text-center text-indigo-600 mt-4 hidden">
+            <div class="animate-spin inline-block w-6 h-6 border-4 border-indigo-500 border-t-transparent rounded-full"></div>
+            <span class="ml-2">Analyzing...</span>
+        </div>
+
+        <div id="results" class="mt-8 p-5 bg-indigo-50 rounded-lg border border-indigo-200 hidden">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4">Analysis Results:</h2>
+            <div id="misspellingsOutput" class="mb-4">
+                <h3 class="text-xl font-medium text-gray-800 mb-2">Potential Misspellings:</h3>
+                <ul class="list-disc list-inside text-gray-700" id="misspellingsList">
+                    <li>No misspellings found.</li>
+                </ul>
+            </div>
+            <div id="grammarOutput">
+                <h3 class="text-xl font-medium text-gray-800 mb-2">Potential Grammar Issues (Uncommon Sequences):</h3>
+                <ul class="list-disc list-inside text-gray-700" id="grammarList">
+                    <li>No uncommon sequences found.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-8 p-5 bg-gray-100 rounded-lg border border-gray-300">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Model Details:</h2>
+            <div class="mb-4">
+                <h3 class="text-xl font-medium text-gray-800 mb-2">Vocabulary Size: <span id="vocabSize" class="font-bold">0</span> words</h3>
+                <button id="toggleVocab" class="text-indigo-600 hover:text-indigo-800 text-sm focus:outline-none">Show/Hide Vocabulary</button>
+                <div id="vocabularyDisplay" class="mt-2 p-3 bg-white rounded-md border border-gray-200 max-h-48 overflow-y-auto hidden">
+                    <pre class="whitespace-pre-wrap text-sm text-gray-700" id="vocabContent"></pre>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-xl font-medium text-gray-800 mb-2">N-gram Counts:</h3>
+                <button id="toggleNgrams" class="text-indigo-600 hover:text-indigo-800 text-sm focus:outline-none">Show/Hide N-grams (Counts)</button>
+                <div id="ngramDisplay" class="mt-2 p-3 bg-white rounded-md border border-gray-200 max-h-48 overflow-y-auto hidden">
+                    <h4 class="font-semibold text-gray-700 mb-1">Bigrams:</h4>
+                    <pre class="whitespace-pre-wrap text-sm text-gray-700" id="bigramContent"></pre>
+                    <h4 class="font-semibold text-gray-700 mt-3 mb-1">Trigrams:</h4>
+                    <pre class="whitespace-pre-wrap text-sm text-gray-700" id="trigramContent"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // This variable will hold the content of the uploaded corpus
+        let corpusText = '';
+
+        // Global N-gram models and vocabulary
+        let vocabulary = new Set();
+        let unigramCounts = new Map();
+        let bigramCounts = new Map();
+        let trigramCounts = new Map();
+
+        // UI Elements
+        const inputText = document.getElementById('inputText');
+        const checkButton = document.getElementById('checkButton');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const resultsDiv = document.getElementById('results');
+        const misspellingsList = document.getElementById('misspellingsList');
+        const grammarList = document.getElementById('grammarList');
+        const vocabSizeSpan = document.getElementById('vocabSize');
+        const toggleVocabButton = document.getElementById('toggleVocab');
+        const vocabularyDisplay = document.getElementById('vocabularyDisplay');
+        const vocabContentPre = document.getElementById('vocabContent');
+        const toggleNgramsButton = document.getElementById('toggleNgrams');
+        const ngramDisplay = document.getElementById('ngramDisplay');
+        const bigramContentPre = document.getElementById('bigramContent');
+        const trigramContentPre = document.getElementById('trigramContent');
+
+        // --- Levenshtein Distance Function ---
+        // Calculates the Levenshtein distance between two strings.
+        // Used for suggesting corrections for misspelled words.
+        function levenshteinDistance(a, b) {
+            const an = a.length;
+            const bn = b.length;
+            if (an === 0) return bn;
+            if (bn === 0) return an;
+
+            const matrix = [];
+            for (let i = 0; i <= an; i++) {
+                matrix[i] = [i];
+            }
+            for (let j = 1; j <= bn; j++) {
+                matrix[0][j] = j;
+            }
+
+            for (let i = 1; i <= an; i++) {
+                for (let j = 1; j <= bn; j++) {
+                    const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j] + 1,      // deletion
+                        matrix[i][j - 1] + 1,      // insertion
+                        matrix[i - 1][j - 1] + cost // substitution
+                    );
+                }
+            }
+            return matrix[an][bn];
+        }
+
+        // --- Text Preprocessing ---
+        // Cleans and tokenizes the input text.
+        // Converts to lowercase, removes punctuation, and splits into words.
+        function preprocessText(text) {
+            // Convert to lowercase and replace non-alphabetic characters (except spaces) with a space
+            // This handles punctuation and ensures consistent word boundaries
+            return text.toLowerCase()
+                       .replace(/[^a-zäöüß\s]/g, ' ') // Keep German umlauts and ß
+                       .split(/\s+/) // Split by one or more spaces
+                       .filter(word => word.length > 0); // Remove empty strings
+        }
+
+        // --- N-gram Model Training ---
+        // Trains unigram, bigram, and trigram models from the corpus.
+        function trainNgramModels(text) {
+            const words = preprocessText(text);
+
+            // Clear previous models
+            vocabulary.clear();
+            unigramCounts.clear();
+            bigramCounts.clear();
+            trigramCounts.clear();
+
+            // Unigrams
+            for (const word of words) {
+                vocabulary.add(word);
+                unigramCounts.set(word, (unigramCounts.get(word) || 0) + 1);
+            }
+
+            // Bigrams
+            for (let i = 0; i < words.length - 1; i++) {
+                const bigram = `${words[i]} ${words[i + 1]}`;
+                bigramCounts.set(bigram, (bigramCounts.get(bigram) || 0) + 1);
+            }
+
+            // Trigrams
+            for (let i = 0; i < words.length - 2; i++) {
+                const trigram = `${words[i]} ${words[i + 1]} ${words[i + 2]}`;
+                trigramCounts.set(trigram, (trigramCounts.get(trigram) || 0) + 1);
+            }
+
+            // Update UI with model details
+            vocabSizeSpan.textContent = vocabulary.size;
+            vocabContentPre.textContent = Array.from(vocabulary).sort().join('\n');
+
+            let bigramOutput = '';
+            Array.from(bigramCounts.entries()).sort((a, b) => b[1] - a[1]).forEach(([ngram, count]) => {
+                bigramOutput += `${ngram}: ${count}\n`;
+            });
+            bigramContentPre.textContent = bigramOutput;
+
+            let trigramOutput = '';
+            Array.from(trigramCounts.entries()).sort((a, b) => b[1] - a[1]).forEach(([ngram, count]) => {
+                trigramOutput += `${ngram}: ${count}\n`;
+            });
+            trigramContentPre.textContent = trigramOutput;
+        }
+
+        // --- Spell Check Function ---
+        // Checks for misspellings and suggests corrections.
+        function checkSpelling(inputWords) {
+            const misspellings = [];
+            const maxDistance = 2; // Max Levenshtein distance for suggestions
+
+            for (const word of inputWords) {
+                if (!vocabulary.has(word)) {
+                    // Word not in vocabulary, suggest corrections
+                    const suggestions = [];
+                    for (const vocabWord of vocabulary) {
+                        const dist = levenshteinDistance(word, vocabWord);
+                        if (dist <= maxDistance) {
+                            suggestions.push({ word: vocabWord, distance: dist });
+                        }
+                    }
+                    // Sort suggestions by distance, then by unigram frequency (higher frequency first)
+                    suggestions.sort((a, b) => {
+                        if (a.distance !== b.distance) {
+                            return a.distance - b.distance;
+                        }
+                        return (unigramCounts.get(b.word) || 0) - (unigramCounts.get(a.word) || 0);
+                    });
+
+                    const suggestionString = suggestions.length > 0
+                        ? `Suggestions: ${suggestions.slice(0, 5).map(s => s.word).join(', ')}`
+                        : 'No close suggestions found.';
+                    misspellings.push(`"${word}" (not in vocabulary). ${suggestionString}`);
+                }
+            }
+            return misspellings;
+        }
+
+        // --- Grammar Check Function (Basic) ---
+        // Flags uncommon bigrams and trigrams.
+        function checkGrammar(inputWords) {
+            const grammarIssues = [];
+            const bigramThreshold = 1; // Flag bigrams appearing <= this many times
+            const trigramThreshold = 1; // Flag trigrams appearing <= this many times
+
+            // Check Bigrams
+            for (let i = 0; i < inputWords.length - 1; i++) {
+                const bigram = `${inputWords[i]} ${inputWords[i + 1]}`;
+                const count = bigramCounts.get(bigram) || 0;
+                if (count <= bigramThreshold) {
+                    grammarIssues.push(`Uncommon bigram: "${bigram}" (appeared ${count} time(s) in corpus)`);
+                }
+            }
+
+            // Check Trigrams
+            for (let i = 0; i < inputWords.length - 2; i++) {
+                const trigram = `${inputWords[i]} ${inputWords[i + 1]} ${inputWords[i + 2]}`;
+                const count = trigramCounts.get(trigram) || 0;
+                if (count <= trigramThreshold) {
+                    grammarIssues.push(`Uncommon trigram: "${trigram}" (appeared ${count} time(s) in corpus)`);
+                }
+            }
+            return grammarIssues;
+        }
+
+        // --- Main Check Function ---
+        // Orchestrates the spell and grammar checks.
+        async function performCheck() {
+            const rawInput = inputText.value;
+            if (!rawInput.trim()) {
+                alert("Please enter some text to check.");
+                return;
+            }
+
+            loadingIndicator.classList.remove('hidden');
+            resultsDiv.classList.add('hidden'); // Hide previous results
+
+            // Simulate a small delay for loading effect
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const inputWords = preprocessText(rawInput);
+
+            const misspellings = checkSpelling(inputWords);
+            const grammarIssues = checkGrammar(inputWords);
+
+            // Display Results
+            misspellingsList.innerHTML = '';
+            if (misspellings.length === 0) {
+                misspellingsList.innerHTML = '<li>No potential misspellings found.</li>';
+            } else {
+                misspellings.forEach(issue => {
+                    const li = document.createElement('li');
+                    li.textContent = issue;
+                    misspellingsList.appendChild(li);
+                });
+            }
+
+            grammarList.innerHTML = '';
+            if (grammarIssues.length === 0) {
+                grammarList.innerHTML = '<li>No uncommon sequences found.</li>';
+            } else {
+                grammarIssues.forEach(issue => {
+                    const li = document.createElement('li');
+                    li.textContent = issue;
+                    grammarList.appendChild(li);
+                });
+            }
+
+            loadingIndicator.classList.add('hidden');
+            resultsDiv.classList.remove('hidden');
+        }
+
+        // --- Event Listeners ---
+        checkButton.addEventListener('click', performCheck);
+
+        toggleVocabButton.addEventListener('click', () => {
+            vocabularyDisplay.classList.toggle('hidden');
+            toggleVocabButton.textContent = vocabularyDisplay.classList.contains('hidden') ? 'Show/Hide Vocabulary' : 'Hide Vocabulary';
+        });
+
+        toggleNgramsButton.addEventListener('click', () => {
+            ngramDisplay.classList.toggle('hidden');
+            toggleNgramsButton.textContent = ngramDisplay.classList.contains('hidden') ? 'Show/Hide N-grams (Counts)' : 'Hide N-grams';
+        });
+
+        // --- Initial Corpus Loading and Model Training ---
+        // Fetches the corpus text and trains the models on app load.
+        window.onload = async () => {
+            try {
+                // Fetch the corpus content using the contentFetchId
+                const response = await fetch(`https://raw.githubusercontent.com/andrewnationdev/arusian-database/refs/heads/main/arusian_db_one.data`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                corpusText = await response.text();
+                trainNgramModels(corpusText);
+                console.log("Corpus loaded and models trained successfully.");
+                console.log("Vocabulary size:", vocabulary.size);
+                console.log("Bigrams count:", bigramCounts.size);
+                console.log("Trigrams count:", trigramCounts.size);
+            } catch (error) {
+                console.error("Failed to load or process corpus:", error);
+                alert("Error loading corpus. Please check the console for details.");
+            }
+        };
+    </script>
+</body>
+</html>
+
