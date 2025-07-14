@@ -1,18 +1,34 @@
 [
-    {
-        "translit_aru": "dem",
-        "semlek": "dem",
-        "ipa_aru": "/dem/",
-        "ipa_pt": "/'lĩ.gw@'/",
-        "pt": "língua, idioma, fala",
-        "word_class": "substantivo"
-    },
-    {
-        "translit_aru": "demr",
-        "semlek": "demr",
-        "ipa_aru": "/dem3/",
-        "ipa_pt": "/fa.'la(R)'/",
-        "pt": "falar, conversar, discutir, discorrer, abordar",
-        "word_class": "verbo transitivo"
-    }
+  {
+    "translit_aru": "dem",
+    "semlek": "dem",
+    "ipa_aru": "/dem/",
+    "ipa_pt": "/'lĩ.gw@'/",
+    "pt": "língua, idioma, fala",
+    "word_class": "substantivo"
+  },
+  {
+    "translit_aru": "demr",
+    "semlek": "demr",
+    "ipa_aru": "/dem3/",
+    "ipa_pt": "/fa.'la(R)'/",
+    "pt": "falar, conversar, discutir, discorrer, abordar",
+    "word_class": "verbo transitivo"
+  },
+  {
+    "translit_aru": "tei",
+    "semlek": "tA",
+    "ipa_aru": "/tei/",
+    "ipa_pt": "/tu/, /vo.\"se/",
+    "pt": "tu, você",
+    "word_class": "pronome"
+  },
+  {
+    "translit_aru": "lu",
+    "semlek": "lu",
+    "ipa_aru": "/lu/",
+    "ipa_pt": "/ew/",
+    "pt": "eu",
+    "word_class": "pronome"
+  }
 ]
