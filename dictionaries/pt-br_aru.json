@@ -1,18 +1,20 @@
-[
-  {
-    "translit_aru": "dem",
-    "semlek": "dem",
-    "ipa_aru": "/dem/",
-    "ipa_pt": "/'lĩ.gw@'/",
-    "pt": "língua, idioma, fala",
-    "word_class": "substantivo"
-  },
-  {
-    "translit_aru": "demr",
-    "semlek": "demr",
-    "ipa_aru": "/dem3/",
-    "ipa_pt": "/fa.'la(R)'/",
-    "pt": "falar, conversar, discutir, discorrer, abordar",
-    "word_class": "verbo transitivo"
-  }
-]
+{
+  "data": [
+    {
+      "translit_aru": "dem",
+      "semlek": "dem",
+      "ipa_aru": "/dem/",
+      "ipa_pt": "/'lĩ.gw@'/",
+      "pt": "língua, idioma, fala",
+      "word_class": "substantivo"
+    },
+    {
+      "translit_aru": "demr",
+      "semlek": "demr",
+      "ipa_aru": "/dem3/",
+      "ipa_pt": "/fa.'la(R)'/",
+      "pt": "falar, conversar, discutir, discorrer, abordar",
+      "word_class": "verbo transitivo"
+    }
+  ]
+}
