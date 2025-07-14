@@ -1,5 +1,4 @@
-{
-  "data": [
+[
     {
       "translit_aru": "dem",
       "semlek": "dem",
@@ -16,5 +15,4 @@
       "pt": "falar, conversar, discutir, discorrer, abordar",
       "word_class": "verbo transitivo"
     }
-  ]
-}
+]
