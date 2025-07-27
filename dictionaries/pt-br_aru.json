@@ -30,5 +30,14 @@
     "ipa_pt": "/ew/",
     "pt": "eu",
     "word_class": "pronome"
+  },
+  {
+    "translit_aru": "decr",
+    "semlek": "dec-r",
+    "ipa_aru": "/deS3/",
+    "ipa_pt": "/kõ.'p4aR/",
+    "pt": "comprar",
+    "word_class": "verbo transitivo"
   }
+  
 ]
