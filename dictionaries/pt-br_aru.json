@@ -38,6 +38,45 @@
     "ipa_pt": "/kõ.'p4aR/",
     "pt": "comprar",
     "word_class": "verbo transitivo"
+  },
+  {
+    "translit_aru": "decra",
+    "semlek": "dec-ra",
+    "ipa_aru": "/deS3Ra/",
+    "ipa_pt": "/kõ.'p4aR/",
+    "pt": "comprar",
+    "word_class": "verbo intransitivo"
+  },
+  {
+    "translit_aru": "decse",
+    "semlek": "dec-s r,",
+    "ipa_aru": "/deS3SE/",
+    "ipa_pt": "/kõ.''p4aR/",
+    "pt": "comprar",
+    "word_class": "verbo passivo"
+  },
+  {
+    "translit_aru": "decrei",
+    "semlek": "dec-s r,",
+    "ipa_aru": "/deS3Rei/",
+    "ipa_pt": "/kõ.''p4aR/",
+    "pt": "comprar",
+    "word_class": "verbo intransitivo passivo"
+  },
+  {
+    "translit_aru": "dec",
+    "semlek": "dec-,",
+    "ipa_aru": "/deS/",
+    "ipa_pt": "/p4o.''du.tu/",
+    "pt": "produto",
+    "word_class": "substantivo"
+  },
+  {
+    "translit_aru": "tek",
+    "semlek": "tec",
+    "ipa_aru": "/tEk/",
+    "ipa_pt": "/eS.''kO.l6/, /eS.''tu.du/",
+    "pt": "escola, estudo",
+    "word_class": "substantivo"
   }
-  
 ]
