@@ -57,7 +57,7 @@
   },
   {
     "translit_aru": "decrei",
-    "semlek": "dec-s r,",
+    "semlek": "dec-ra,",
     "ipa_aru": "/deS3Rei/",
     "ipa_pt": "/kõ.''p4aR/",
     "pt": "comprar",
@@ -85,6 +85,14 @@
     "ipa_aru": "/tE.k3/",
     "ipa_pt": "/a.prẽ.''deR/, /eS.tu.''daR",
     "pt": "escola, estudo",
+    "word_class": "substantivo"
+  }
+  {
+    "translit_aru": "su decrei",
+    "semlek": "su decra,",
+    "ipa_aru": "/su.deS.3Rei/",
+    "ipa_pt": "/p4o.''du.tu/",
+    "pt": "produto",
     "word_class": "substantivo"
   }
 ]
