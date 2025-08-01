@@ -145,7 +145,7 @@
         function trainNgramModel(text, n) {
             const model = {};
             // Convert text to lowercase and split into words.
-            const words = text.toLowerCase().match(/\b\w+\b/g);
+            const words = text.toLowerCase().match(/\b\w+\b/gu);
 
             if (!words || words.length < n) {
                 console.warn("Corpus is too small for the specified N-gram or tokenization failed.");
@@ -178,7 +178,7 @@
          */
         function generateResponse(input, n, model) {
             // Convert input to lowercase and split into words
-            const inputWords = input.toLowerCase().match(/\b\w+\b/g);
+            const inputWords = input.toLowerCase().match(/\b\w+\b/gu);
 
             if (!inputWords || inputWords.length === 0) {
                 return "Vej sa lu srouwr tei :( Nepa-tei delr tei demr so sasa jekreis?";
