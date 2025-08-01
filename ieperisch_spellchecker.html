@@ -145,14 +145,11 @@
         // Cleans and tokenizes the input text.
         // Converts to lowercase, removes punctuation, and splits into words.
         function preprocessText(text) {
-            // Convert to lowercase and replace non-alphabetic characters (except spaces) with a space
-            // This handles punctuation and ensures consistent word boundaries
-            return text.toLowerCase()
-                       .replace(/[^a-zäöüß\s]/g, ' ') // Keep German umlauts and ß
-                       .split(/\s+/) // Split by one or more spaces
-                       .filter(word => word.length > 0); // Remove empty strings
+            text = text.toLowerCase();
+            let cleanedText = text.replace(/[\.,\/#!$%\^&\*;:{}=\_`~()]/g," ");
+            const words = cleanedText.match(/[\p{L}\d'-]+/gu);
+            return words || [];
         }
-
         // --- N-gram Model Training ---
         // Trains unigram, bigram, and trigram models from the corpus.
         function trainNgramModels(text) {
