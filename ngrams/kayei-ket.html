@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,25 +12,31 @@
             font-family: 'Inter', sans-serif;
             background-color: #f0f2f5;
         }
+
         #chat-box::-webkit-scrollbar {
             width: 8px;
         }
+
         #chat-box::-webkit-scrollbar-track {
             background: #e2e8f0;
             border-radius: 10px;
         }
+
         #chat-box::-webkit-scrollbar-thumb {
             background: #94a3b8;
             border-radius: 10px;
         }
+
         #chat-box::-webkit-scrollbar-thumb:hover {
             background: #64748b;
         }
+
         .message-fade-in {
             opacity: 0;
             transform: translateY(10px);
             animation: fadeIn 0.3s ease-out forwards;
         }
+
         @keyframes fadeIn {
             to {
                 opacity: 1;
@@ -90,6 +97,7 @@
         }
     </style>
 </head>
+
 <body class="flex items-center justify-center min-h-screen p-4">
     <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md mx-auto border border-gray-200">
         <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">Kayei-Ket (ALPHA)</h1>
@@ -99,9 +107,9 @@
 
         <div class="flex items-center space-x-3">
             <input type="text" id="user-input" placeholder="Tei delr tei semras sasa pus..."
-                   class="flex-grow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 transition duration-200 ease-in-out">
+                class="flex-grow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 transition duration-200 ease-in-out">
             <button id="send-button">
-                <i class="fas fa-paper-plane"></i> 
+                <i class="fas fa-paper-plane"></i>
             </button>
         </div>
     </div>
@@ -167,6 +175,41 @@
                 model[context][nextWord]++;
             }
             return model;
+        }
+
+        function addMessageToChat(message, sender, isSystem = false) {
+            const chatBox = document.getElementById('chat-box');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message-bubble', 'message-fade-in');
+
+            if (isSystem) {
+                messageElement.classList.add('bg-yellow-100', 'text-yellow-800', 'self-center', 'text-sm', 'italic', 'rounded-lg', 'px-3', 'py-2', 'max-w-full');
+            } else if (sender === 'user') {
+                messageElement.classList.add('user');
+            } else {
+                messageElement.classList.add('bot');
+            }
+            messageElement.textContent = message;
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Guardar mensaje si es del bot o usuario
+            if (sender === 'bot' || sender === 'user') {
+                saveMessage({ message, sender, isSystem });
+            }
+        }
+
+        // Guarda mensajes en localStorage
+        function saveMessage(msgObj) {
+            let saved = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+            saved.push(msgObj);
+            localStorage.setItem('chatHistory', JSON.stringify(saved));
+        }
+
+        // Carga mensajes al iniciar
+        function loadMessages() {
+            let saved = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+            saved.forEach(msg => addMessageToChat(msg.message, msg.sender, msg.isSystem));
         }
 
         /**
@@ -254,6 +297,8 @@
             const userInput = document.getElementById('user-input');
             const sendButton = document.getElementById('send-button');
 
+            loadMessages();
+
             userInput.disabled = true;
             sendButton.disabled = true;
 
@@ -297,7 +342,7 @@
                     userInput.value = '';
 
                     const botResponse = generateResponse(message, N, ngramModel);
-                    setTimeout(() => { 
+                    setTimeout(() => {
                         addMessageToChat(botResponse, 'bot');
                     }, 500);
                 }
@@ -313,4 +358,5 @@
         });
     </script>
 </body>
+
 </html>
