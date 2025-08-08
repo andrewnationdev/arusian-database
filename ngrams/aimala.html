@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>N-gram Chatbot</title>
+    <title>Aimala - Ieperisch/Platdaich Model</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -98,7 +98,7 @@
         </div>
 
         <div class="flex items-center space-x-3">
-            <input type="text" id="user-input" placeholder="Tei delr tei semras sasa pus..."
+            <input type="text" id="user-input" placeholder="Scréif etwat hier..."
                    class="flex-grow border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 transition duration-200 ease-in-out">
             <button id="send-button">
                 <i class="fas fa-paper-plane"></i> 
@@ -160,7 +160,7 @@
             const inputWords = input.toLowerCase().match(/\p{L}+/gu);
 
             if (!inputWords || inputWords.length === 0) {
-                return "Vej sa lu srouwr tei :( Nepa-tei delr tei demr so sasa jekreis?";
+                return "Ich begréip u nét, ! dúd mir laid ! :( ? Kontet u dat noch amol zegen ?";
             }
 
             let currentContext = "";
@@ -246,7 +246,7 @@
                     addMessageToChat("Error: The loaded corpus is empty or too small to train the N-gram model. Please check the file content.", "bot", true);
                 } else {
                     isModelReady = true;
-                    addMessageToChat("Susu! Lu trmr Kayei-Ket. Lu ouwr lu edr tei u rmr tek sa arujei-dem. Puwei-tei? Puwei-dei teis?", "bot");
+                    addMessageToChat("! Laslo ! Ich hait mir Aimala un ich sprêk platdaitch des Ieperes of Porto Lobos. ? Ale in ordene ?", "bot");
                     userInput.disabled = false;
                     sendButton.disabled = false;
                 }
